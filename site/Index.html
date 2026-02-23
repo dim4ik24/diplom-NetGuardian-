@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetGuardian — Інтелектуальний Комплекс Діагностики Мереж</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts - JetBrains Mono & Orbitron -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'neon-green': '#00ff41',
+                        'cyber-blue': '#00d9ff',
+                        'dark-bg': '#0a0a0a',
+                        'dark-card': '#111111',
+                        'dark-border': '#1a1a1a',
+                    },
+                    fontFamily: {
+                        'mono': ['JetBrains Mono', 'monospace'],
+                        'display': ['Orbitron', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background Grid */
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+        
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
+        }
+        
+        /* Terminal Effect */
+        .terminal {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff41;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 20px rgba(0, 255, 65, 0.1);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .terminal-line {
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        .terminal-line:nth-child(1) { animation-delay: 0.5s; }
+        .terminal-line:nth-child(2) { animation-delay: 1s; }
+        .terminal-line:nth-child(3) { animation-delay: 1.5s; }
+        .terminal-line:nth-child(4) { animation-delay: 2s; }
+        .terminal-line:nth-child(5) { animation-delay: 2.5s; }
+        .terminal-line:nth-child(6) { animation-delay: 3s; }
+        
+        /* Cursor Blink */
+        .cursor {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        
+        /* Glass Card Effect */
+        .glass-card {
+            background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            background: rgba(17, 17, 17, 0.8);
+            border-color: #00ff41;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        /* Neon Glow */
+        .neon-text {
+            text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 30px #00ff41;
+        }
+        
+        .neon-border {
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+        }
+        
+        /* Glitch Effect */
+        .glitch {
+            position: relative;
+            animation: glitch 3s infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 2px); }
+            94% { transform: translate(2px, -2px); }
+            96% { transform: translate(-2px, -2px); }
+            98% { transform: translate(2px, 2px); }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #00ff41;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00d9ff;
+        }
+        
+        /* Button Styles */
+        .cyber-btn {
+            position: relative;
+            padding: 12px 30px;
+            background: transparent;
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            overflow: hidden;
+            transition: all 0.3s;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+        
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #00ff41;
+            transition: left 0.3s;
+            z-index: -1;
+        }
+        
+        .cyber-btn:hover {
+            color: #0a0a0a;
+            box-shadow: 0 0 20px #00ff41;
+        }
+        
+        .cyber-btn:hover::before {
+            left: 0;
+        }
+        
+        /* Tech Stack Icons */
+        .tech-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .tech-icon:hover {
+            transform: scale(1.2) rotate(5deg);
+            color: #00ff41;
+        }
+        
+        /* Architecture Card Pulse */
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(0, 255, 65, 0.3); }
+            50% { border-color: rgba(0, 255, 65, 0.8); }
+        }
+        
+        .arch-card {
+            animation: pulse-border 3s infinite;
+        }
+        
+        /* Pulse Animation for Download Button */
+        @keyframes pulse-animation {
+            0%, 100% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.05); opacity: 0.3; }
+        }
+        
+        .pulse-animation {
+            animation: pulse-animation 2s infinite;
+        }
+        
+        /* Custom Scrollbar for Changelog */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #00ff41;
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #00d9ff;
+        }
+        
+        /* Enhanced AOS fade animations */
+        [data-aos="fade-down"] {
+            transform: translate3d(0, -40px, 0);
+            opacity: 0;
+        }
+        
+        [data-aos="fade-down"].aos-animate {
+            transform: translate3d(0, 0, 0);
+            opacity: 1;
+        }
+        
+        [data-aos="fade-right"] {
+            transform: translate3d(-40px, 0, 0);
+            opacity: 0;
+        }
+        
+        [data-aos="fade-right"].aos-animate {
+            transform: translate3d(0, 0, 0);
+            opacity: 1;
+        }
+        
+        [data-aos="fade-left"] {
+            transform: translate3d(40px, 0, 0);
+            opacity: 0;
+        }
+        
+        [data-aos="fade-left"].aos-animate {
+            transform: translate3d(0, 0, 0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="grid-bg">
+    
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
+        <!-- Background Effects -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute top-20 left-10 w-96 h-96 bg-neon-green opacity-10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-20 right-10 w-96 h-96 bg-cyber-blue opacity-10 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div class="container mx-auto max-w-7xl relative z-10">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Left Side: Title & Info -->
+                <div data-aos="fade-right" data-aos-anchor-placement="top-center">
+                    <div class="mb-4">
+                        <span class="text-neon-green text-sm uppercase tracking-widest font-mono">[ Дипломний Проект 2026 ]</span>
+                    </div>
+                    <h1 class="font-display text-7xl md:text-8xl font-black mb-6 glitch neon-text">
+                        NetGuardian 📡
+                    </h1>
+                    <p class="text-xl md:text-2xl text-gray-300 mb-4 leading-relaxed">
+                        Інтелектуальний програмно-апаратний комплекс для <span class="text-cyber-blue font-semibold">діагностики</span> та <span class="text-neon-green font-semibold">відновлення</span> мереж
+                    </p>
+                    <div class="mb-8 text-gray-400 font-mono">
+                        <p class="mb-2"><i class="fas fa-user-graduate text-neon-green mr-2"></i> Дипломна робота 2026</p>
+                        <p><i class="fas fa-microchip text-neon-green mr-2"></i> IoT + AI + Network Engineering</p>
+                    </div>
+                    <div class="flex gap-3 flex-wrap items-center text-sm">
+                        <span class="px-4 py-2 bg-neon-green bg-opacity-10 border border-neon-green rounded text-neon-green">
+                            <i class="fas fa-brain mr-2"></i> AI-Powered
+                        </span>
+                        <span class="px-4 py-2 bg-orange-500 bg-opacity-10 border border-orange-500 rounded text-orange-500">
+                            <i class="fas fa-tools mr-2"></i> Auto-Healing
+                        </span>
+                        <span class="px-4 py-2 bg-cyan-500 bg-opacity-10 border border-cyan-500 rounded text-cyan-500">
+                            <i class="fas fa-shield-alt mr-2"></i> Security
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Right Side: Terminal -->
+                <div data-aos="fade-left" data-aos-delay="200" data-aos-anchor-placement="top-center">
+                    <div class="terminal rounded-lg p-6 font-mono text-sm">
+                        <div class="flex items-center gap-2 mb-4 pb-3 border-b border-neon-green">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span class="ml-2 text-gray-400">netguardian@terminal:~$</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="terminal-line text-neon-green">
+                                <span class="text-gray-400">$</span> ./netguardian --init
+                            </div>
+                            <div class="terminal-line text-cyber-blue">
+                                <i class="fas fa-check-circle mr-2"></i> System Check................. [OK]
+                            </div>
+                            <div class="terminal-line text-cyber-blue">
+                                <i class="fas fa-check-circle mr-2"></i> AI Agent.................... [ACTIVE]
+                            </div>
+                            <div class="terminal-line text-cyber-blue">
+                                <i class="fas fa-check-circle mr-2"></i> Probe Connection......... [ESTABLISHED]
+                            </div>
+                            <div class="terminal-line text-yellow-400">
+                                <i class="fas fa-wifi mr-2"></i> Network Status............ [MONITORING]
+                            </div>
+                            <div class="terminal-line text-neon-green">
+                                <span class="text-gray-400">$</span> <span class="cursor">_</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Problem Section -->
+    <section class="py-20 px-6 relative">
+        <div class="container mx-auto max-w-6xl">
+            <div data-aos="fade-down" class="text-center mb-16">
+                <h2 class="font-display text-5xl font-bold mb-4 text-neon-green">Чому це важливо?</h2>
+                <div class="w-24 h-1 bg-neon-green mx-auto"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div data-aos="fade-down" data-aos-delay="100" class="glass-card rounded-lg p-6 text-center">
+                    <div class="text-5xl mb-4">
+                        <i class="fas fa-wifi text-red-500"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">Нестабільний Інтернет</h3>
+                    <p class="text-gray-400 text-sm">Постійні обриви з'єднання заважають роботі та навчанню</p>
+                </div>
+                
+                <div data-aos="fade-down" data-aos-delay="200" class="glass-card rounded-lg p-6 text-center">
+                    <div class="text-5xl mb-4">
+                        <i class="fas fa-gamepad text-yellow-500"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">Лаги в Іграх</h3>
+                    <p class="text-gray-400 text-sm">Високий пінг руйнує ігровий досвід</p>
+                </div>
+                
+                <div data-aos="fade-down" data-aos-delay="300" class="glass-card rounded-lg p-6 text-center">
+                    <div class="text-5xl mb-4">
+                        <i class="fas fa-router text-orange-500"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">Зависання Роутерів</h3>
+                    <p class="text-gray-400 text-sm">Потрібен постійний ручний перезапуск обладнання</p>
+                </div>
+                
+                <div data-aos="fade-down" data-aos-delay="400" class="glass-card rounded-lg p-6 text-center">
+                    <div class="text-5xl mb-4">
+                        <i class="fas fa-question-circle text-cyan-500"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">Складна Діагностика</h3>
+                    <p class="text-gray-400 text-sm">Користувачам важко знайти причину проблеми</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Architecture Section (Main) -->
+    <section class="py-20 px-6 relative">
+        <div class="container mx-auto max-w-7xl">
+            <div data-aos="fade-down" class="text-center mb-16">
+                <h2 class="font-display text-5xl font-bold mb-4 text-cyber-blue">Архітектура Системи 📡</h2>
+                <div class="w-24 h-1 bg-cyber-blue mx-auto mb-4"></div>
+                <p class="text-gray-400 text-lg">Три компоненти працюють синхронно для захисту вашої мережі</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Component 1: Desktop Agent -->
+                <div data-aos="fade-down" data-aos-delay="100" class="glass-card arch-card rounded-xl p-8 border-2">
+                    <div class="text-center mb-6">
+                        <div class="inline-block p-4 bg-neon-green bg-opacity-20 rounded-full mb-4">
+                            <i class="fas fa-desktop text-5xl text-neon-green"></i>
+                        </div>
+                        <h3 class="font-display text-2xl font-bold text-neon-green mb-2">Desktop Agent</h3>
+                        <span class="text-xs uppercase tracking-widest text-gray-500">[ CORE BRAIN ]</span>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-code text-neon-green mt-1"></i>
+                            <div>
+                                <p class="font-semibold">Python Application</p>
+                                <p class="text-gray-400">Основна логіка системи</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-brain text-neon-green mt-1"></i>
+                            <div>
+                                <p class="font-semibold">AI-Powered Analysis</p>
+                                <p class="text-gray-400">LLM для інтерпретації помилок</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-network-wired text-neon-green mt-1"></i>
+                            <div>
+                                <p class="font-semibold">DNS Optimization</p>
+                                <p class="text-gray-400">Автоматичний вибір найшвидшого сервера</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-tools text-neon-green mt-1"></i>
+                            <div>
+                                <p class="font-semibold">Auto-Healing Scripts</p>
+                                <p class="text-gray-400">Автоматичне відновлення</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Component 2: Hardware Probe -->
+                <div data-aos="fade-down" data-aos-delay="300" class="glass-card arch-card rounded-xl p-8 border-2">
+                    <div class="text-center mb-6">
+                        <div class="inline-block p-4 bg-orange-500 bg-opacity-20 rounded-full mb-4">
+                            <i class="fas fa-microchip text-5xl text-orange-500"></i>
+                        </div>
+                        <h3 class="font-display text-2xl font-bold text-orange-500 mb-2">Hardware Probe</h3>
+                        <span class="text-xs uppercase tracking-widest text-gray-500">[ IOT WATCHDOG ]</span>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-microchip text-orange-500 mt-1"></i>
+                            <div>
+                                <p class="font-semibold">Raspberry Pi Zero 2 W</p>
+                                <p class="text-gray-400">Компактний SBC</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-clock text-orange-500 mt-1"></i>
+                            <div>
+                                <p class="font-semibold">24/7 Моніторинг</p>
+                                <p class="text-gray-400">Працює незалежно від ПК</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-ethernet text-orange-500 mt-1"></i>
+                            <div>
+                                <p class="font-semibold">USB to RJ45</p>
+                                <p class="text-gray-400">Адаптер SUNROZ</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-file-alt text-orange-500 mt-1"></i>
+                            <div>
+                                <p class="font-semibold">Black Box Logging</p>
+                                <p class="text-gray-400">Автономні офлайн логи</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Component 3: Telegram Bot -->
+                <div data-aos="fade-down" data-aos-delay="500" class="glass-card arch-card rounded-xl p-8 border-2">
+                    <div class="text-center mb-6">
+                        <div class="inline-block p-4 bg-cyan-500 bg-opacity-20 rounded-full mb-4">
+                            <i class="fab fa-telegram text-5xl text-cyan-500"></i>
+                        </div>
+                        <h3 class="font-display text-2xl font-bold text-cyan-500 mb-2">Telegram Bot</h3>
+                        <span class="text-xs uppercase tracking-widest text-gray-500">[ REMOTE CONTROL ]</span>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-mobile-alt text-cyan-500 mt-1"></i>
+                            <div>
+                                <p class="font-semibold">Mobile Interface</p>
+                                <p class="text-gray-400">Керування зі смартфона</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-bell text-cyan-500 mt-1"></i>
+                            <div>
+                                <p class="font-semibold">Instant Alerts</p>
+                                <p class="text-gray-400">Сповіщення про збої</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-image text-cyan-500 mt-1"></i>
+                            <div>
+                                <p class="font-semibold">Remote Screenshot</p>
+                                <p class="text-gray-400">Команда /screen</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-redo text-cyan-500 mt-1"></i>
+                            <div>
+                                <p class="font-semibold">Remote Reboot</p>
+                                <p class="text-gray-400">Команда /reboot</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Software Features Section -->
+    <section class="py-20 px-6 bg-gradient-to-b from-transparent to-dark-card">
+        <div class="container mx-auto max-w-7xl">
+            <div data-aos="fade-down" class="text-center mb-16">
+                <h2 class="font-display text-5xl font-bold mb-4 text-neon-green">Програмні Можливості</h2>
+                <div class="w-24 h-1 bg-neon-green mx-auto mb-4"></div>
+                <p class="text-gray-400 text-lg">Комплексні інструменти для діагностики та оптимізації</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature 1 -->
+                <div data-aos="fade-down" data-aos-delay="100" class="glass-card rounded-lg p-6 hover:border-neon-green">
+                    <div class="flex items-start gap-4">
+                        <div class="text-3xl text-neon-green flex-shrink-0">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Multi-Layer Diagnostics</h4>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                Одночасний пінг <span class="text-cyan-400">Gateway</span>, <span class="text-yellow-400">ISP</span> та <span class="text-green-400">Google (8.8.8.8)</span> для точного визначення винуватця збою
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div data-aos="fade-down" data-aos-delay="200" class="glass-card rounded-lg p-6 hover:border-neon-green">
+                    <div class="flex items-start gap-4">
+                        <div class="text-3xl text-neon-green flex-shrink-0">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">AI Log Humanizer</h4>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                LLM-модуль перекладає технічні помилки на зрозумілу мову: <code class="text-red-400">Error 651</code> → "Проблема з PPPoE підключенням"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div data-aos="fade-down" data-aos-delay="300" class="glass-card rounded-lg p-6 hover:border-neon-green">
+                    <div class="flex items-start gap-4">
+                        <div class="text-3xl text-neon-green flex-shrink-0">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Auto-Healing</h4>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                Автоматичне виконання <code class="text-yellow-400">ipconfig /flushdns</code>, перезапуск мережевих адаптерів без участі користувача
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div data-aos="fade-down" data-aos-delay="400" class="glass-card rounded-lg p-6 hover:border-neon-green">
+                    <div class="flex items-start gap-4">
+                        <div class="text-3xl text-neon-green flex-shrink-0">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Smart DNS Benchmark</h4>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                Тестування швидкості DNS-серверів та автоматичне перемикання на найшвидший: Cloudflare (1.1.1.1) або Google (8.8.8.8)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div data-aos="fade-down" data-aos-delay="500" class="glass-card rounded-lg p-6 hover:border-neon-green">
+                    <div class="flex items-start gap-4">
+                        <div class="text-3xl text-neon-green flex-shrink-0">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Game Latency Optimizer</h4>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                Виявлення та "вбивство" фонових процесів (торенти, оновлення), що завантажують канал під час гри
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div data-aos="fade-down" data-aos-delay="600" class="glass-card rounded-lg p-6 hover:border-neon-green">
+                    <div class="flex items-start gap-4">
+                        <div class="text-3xl text-neon-green flex-shrink-0">
+                            <i class="fas fa-ethernet"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Link Speed Monitor</h4>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                Моніторинг фізичного підключення. Якщо швидкість впала з 1000 до 100 Мбіт/с — алерт про проблемний кабель
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature 7 -->
+                <div data-aos="fade-down" data-aos-delay="100" class="glass-card rounded-lg p-6 hover:border-neon-green">
+                    <div class="flex items-start gap-4">
+                        <div class="text-3xl text-neon-green flex-shrink-0">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">LAN Security Audit</h4>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                ARP-сканування мережі: виявлення чужинців у Wi-Fi, перевірка роутера на стандартні паролі та CVE
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature 8 - NEW -->
+                <div data-aos="fade-down" data-aos-delay="200" class="glass-card rounded-lg p-6 hover:border-neon-green border-2 border-yellow-500">
+                    <div class="flex items-start gap-4">
+                        <div class="text-3xl text-yellow-500 flex-shrink-0">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2 text-yellow-500">Енергомоніторинг <span class="text-xs bg-yellow-500 text-black px-2 py-1 rounded ml-2">NEW</span></h4>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                TP-Link Tapo P110 збирає графіки споживання струму роутером. Допомагає виявити апаратні збої по аномальному споживанню Ват
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works (Technical Deep Dive) -->
+    <section class="py-20 px-6 relative">
+        <div class="container mx-auto max-w-7xl">
+            <div data-aos="fade-down" class="text-center mb-16">
+                <h2 class="font-display text-5xl font-bold mb-4 text-yellow-400">Як це працює?</h2>
+                <div class="w-24 h-1 bg-yellow-400 mx-auto mb-4"></div>
+                <p class="text-gray-400 text-lg">Технічні деталі роботи ключових модулів</p>
+            </div>
+            
+            <div class="space-y-8">
+                <!-- Multi-Layer Diagnostics -->
+                <div data-aos="fade-right" class="glass-card rounded-xl p-8 border-l-4 border-neon-green">
+                    <div class="flex items-start gap-6">
+                        <div class="flex-shrink-0">
+                            <div class="w-16 h-16 rounded-full bg-neon-green bg-opacity-20 flex items-center justify-center">
+                                <i class="fas fa-layer-group text-2xl text-neon-green"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-display text-2xl font-bold mb-3 text-neon-green">Multi-Layer Root Cause Analysis</h3>
+                            <p class="text-gray-300 mb-4">
+                                Більшість програм просто кажуть "немає інтернету". NetGuardian проводить глибокий аналіз.
+                            </p>
+                            <div class="bg-black bg-opacity-50 rounded-lg p-6 font-mono text-sm space-y-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-cyan-400">1.</span>
+                                    <span class="text-gray-300">Паралельний пінг трьох точок: <span class="text-yellow-400">Gateway</span>, <span class="text-orange-400">ISP DNS</span>, <span class="text-green-400">8.8.8.8</span></span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-cyan-400">2.</span>
+                                    <span class="text-gray-300">Порівняння затримок та втрат пакетів на кожному етапі</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-cyan-400">3.</span>
+                                    <span class="text-gray-300">Висновок: Пінг високий тільки до роутера? → Проблема Wi-Fi/кабель</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-cyan-400">4.</span>
+                                    <span class="text-gray-300">До роутера ОК, далі втрати? → Провайдер</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-cyan-400">5.</span>
+                                    <span class="text-gray-300">Все працює, крім одного сайту? → Сервер сайту</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Log Humanizer -->
+                <div data-aos="fade-left" class="glass-card rounded-xl p-8 border-l-4 border-purple-500">
+                    <div class="flex items-start gap-6">
+                        <div class="flex-shrink-0">
+                            <div class="w-16 h-16 rounded-full bg-purple-500 bg-opacity-20 flex items-center justify-center">
+                                <i class="fas fa-brain text-2xl text-purple-500"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-display text-2xl font-bold mb-3 text-purple-500">AI Log Humanizer</h3>
+                            <p class="text-gray-300 mb-4">
+                                Переклад з "айтішної" на людську мову через локальну нейромережу
+                            </p>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-red-900 bg-opacity-30 rounded-lg p-4 border border-red-500">
+                                    <p class="text-red-400 font-mono text-xs mb-2">❌ Системна помилка:</p>
+                                    <code class="text-red-300 text-xs">DNS_PROBE_FINISHED_NXDOMAIN</code>
+                                </div>
+                                <div class="bg-green-900 bg-opacity-30 rounded-lg p-4 border border-green-500">
+                                    <p class="text-green-400 font-mono text-xs mb-2">✅ AI пояснення:</p>
+                                    <p class="text-green-300 text-xs">"Ваш комп'ютер не може знайти адресу сайту. Це схоже на проблему телефонної книги. Я спробую оновити DNS-кеш"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Auto-Healing -->
+                <div data-aos="fade-right" class="glass-card rounded-xl p-8 border-l-4 border-cyan-500">
+                    <div class="flex items-start gap-6">
+                        <div class="flex-shrink-0">
+                            <div class="w-16 h-16 rounded-full bg-cyan-500 bg-opacity-20 flex items-center justify-center">
+                                <i class="fas fa-magic text-2xl text-cyan-500"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-display text-2xl font-bold mb-3 text-cyan-500">Auto-Healing Scripts</h3>
+                            <p class="text-gray-300 mb-4">
+                                Набір заготовлених скриптів, які автоматично виправляють проблеми
+                            </p>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-4 bg-black bg-opacity-50 rounded p-3">
+                                    <i class="fas fa-check-circle text-neon-green"></i>
+                                    <code class="text-yellow-400 text-sm flex-1">ipconfig /flushdns</code>
+                                    <span class="text-gray-400 text-xs">→ DNS проблеми</span>
+                                </div>
+                                <div class="flex items-center gap-4 bg-black bg-opacity-50 rounded p-3">
+                                    <i class="fas fa-check-circle text-neon-green"></i>
+                                    <code class="text-yellow-400 text-sm flex-1">ipconfig /release & renew</code>
+                                    <span class="text-gray-400 text-xs">→ IP конфлікт</span>
+                                </div>
+                                <div class="flex items-center gap-4 bg-black bg-opacity-50 rounded p-3">
+                                    <i class="fas fa-check-circle text-neon-green"></i>
+                                    <code class="text-yellow-400 text-sm flex-1">netsh interface set disable/enable</code>
+                                    <span class="text-gray-400 text-xs">→ Завис адаптер</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Hardware Deep Dive -->
+    <section class="py-20 px-6 relative bg-gradient-to-b from-transparent to-dark-card">
+        <div class="container mx-auto max-w-6xl">
+            <div data-aos="fade-down" class="text-center mb-16">
+                <h2 class="font-display text-5xl font-bold mb-4 text-orange-500">
+                    <i class="fas fa-microchip mr-3"></i> Апаратна Частина 📡
+                </h2>
+                <div class="w-24 h-1 bg-orange-500 mx-auto mb-4"></div>
+                <p class="text-gray-400 text-lg">Унікальне рішення з IoT та фізичним watchdog механізмом</p>
+                <p class="text-neon-green font-mono text-sm mt-2">[ Родзинка дипломного проекту ]</p>
+            </div>
+            
+            <div data-aos="fade-down" class="glass-card rounded-2xl p-10 neon-border mb-10">
+                <div class="grid md:grid-cols-2 gap-12">
+                    <!-- Left: Hardware Components -->
+                    <div>
+                        <h3 class="font-display text-2xl font-bold mb-6 text-orange-500">
+                            <i class="fas fa-sitemap mr-2"></i> Компоненти Системи
+                        </h3>
+                        <div class="space-y-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-full bg-orange-500 bg-opacity-20 flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-microchip text-orange-500"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-lg">Raspberry Pi Zero 2 W</p>
+                                    <p class="text-gray-400 text-sm mb-2">Центральний модуль зонда</p>
+                                    <ul class="text-xs space-y-1 text-gray-500">
+                                        <li>• Raspberry Pi OS Lite</li>
+                                        <li>• 1 GHz Quad-core ARM</li>
+                                        <li>• 512 MB RAM</li>
+                                        <li>• Flask API Server</li>
+                                        <li>• 24/7 uptime моніторинг</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-full bg-cyan-500 bg-opacity-20 flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-ethernet text-cyan-500"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-lg">SUNROZ Micro USB to RJ45</p>
+                                    <p class="text-gray-400 text-sm mb-2">Мережевий адаптер</p>
+                                    <ul class="text-xs space-y-1 text-gray-500">
+                                        <li>• USB 2.0 to Ethernet</li>
+                                        <li>• Підключення Pi до роутера</li>
+                                        <li>• Stable LAN connection</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-full bg-red-500 bg-opacity-20 flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-plug text-red-500"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-lg">TP-Link Tapo P110</p>
+                                    <p class="text-gray-400 text-sm mb-2">Розумна розетка з енергомоніторингом</p>
+                                    <ul class="text-xs space-y-1 text-gray-500">
+                                        <li>• Local API (LAN control)</li>
+                                        <li>• Без залежності від хмари</li>
+                                        <li>• HTTP REST endpoints</li>
+                                        <li>• Вимірювання споживання Ват</li>
+                                        <li>• Макс. навантаження 16A</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-full bg-blue-500 bg-opacity-20 flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-router text-blue-500"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-lg">Домашній Роутер</p>
+                                    <p class="text-gray-400 text-sm mb-2">Підключений через Tapo P110</p>
+                                    <ul class="text-xs space-y-1 text-gray-500">
+                                        <li>• Живлення через розумну розетку</li>
+                                        <li>• Фізичний hard reset</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Watchdog Algorithm -->
+                    <div>
+                        <h3 class="font-display text-2xl font-bold mb-6 text-neon-green">
+                            <i class="fas fa-robot mr-2"></i> Watchdog Алгоритм
+                        </h3>
+                        <div class="bg-black bg-opacity-70 rounded-lg p-6 font-mono text-sm space-y-4">
+                            <div class="flex items-start gap-3">
+                                <span class="text-neon-green font-bold">1.</span>
+                                <div>
+                                    <p class="text-neon-green font-semibold mb-1">Continuous Monitoring</p>
+                                    <p class="text-gray-400 text-xs">Raspberry Pi пінгує Google (8.8.8.8) кожні 30 секунд</p>
+                                </div>
+                            </div>
+                            
+                            <div class="w-full h-px bg-gray-700"></div>
+                            
+                            <div class="flex items-start gap-3">
+                                <span class="text-yellow-400 font-bold">2.</span>
+                                <div>
+                                    <p class="text-yellow-400 font-semibold mb-1">Failure Detection</p>
+                                    <p class="text-gray-400 text-xs">Якщо немає відповіді 10 разів підряд (5 хв) → ALARM!</p>
+                                    <code class="text-red-400 text-xs block mt-1">if failed_pings >= 10: trigger_reboot()</code>
+                                </div>
+                            </div>
+                            
+                            <div class="w-full h-px bg-gray-700"></div>
+                            
+                            <div class="flex items-start gap-3">
+                                <span class="text-orange-400 font-bold">3.</span>
+                                <div>
+                                    <p class="text-orange-400 font-semibold mb-1">Local API Call to Tapo</p>
+                                    <p class="text-gray-400 text-xs">POST запит на TP-Link Tapo P110 (Local LAN)</p>
+                                    <code class="text-cyan-400 text-xs block mt-1">POST /api/device/power {"state":"off"}</code>
+                                </div>
+                            </div>
+                            
+                            <div class="w-full h-px bg-gray-700"></div>
+                            
+                            <div class="flex items-start gap-3">
+                                <span class="text-red-500 font-bold">4.</span>
+                                <div>
+                                    <p class="text-red-500 font-semibold mb-1">Power Cycle</p>
+                                    <p class="text-gray-400 text-xs">Розетка вимикає живлення роутера на 10 секунд</p>
+                                    <code class="text-purple-400 text-xs block mt-1">sleep(10)</code>
+                                </div>
+                            </div>
+                            
+                            <div class="w-full h-px bg-gray-700"></div>
+                            
+                            <div class="flex items-start gap-3">
+                                <span class="text-cyan-400 font-bold">5.</span>
+                                <div>
+                                    <p class="text-cyan-400 font-semibold mb-1">Power Restore</p>
+                                    <p class="text-gray-400 text-xs">Розетка вмикає живлення назад</p>
+                                    <code class="text-cyan-400 text-xs block mt-1">POST /api/device/power {"state":"on"}</code>
+                                </div>
+                            </div>
+                            
+                            <div class="w-full h-px bg-gray-700"></div>
+                            
+                            <div class="flex items-start gap-3">
+                                <span class="text-neon-green font-bold">6.</span>
+                                <div>
+                                    <p class="text-neon-green font-semibold mb-1">Recovery & Notification</p>
+                                    <p class="text-gray-400 text-xs">Роутер boot (~60 сек), Telegram сповіщення надіслано</p>
+                                    <code class="text-green-400 text-xs block mt-1">telegram_bot.send("✅ Router rebooted!")</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Why This Matters -->
+            <div data-aos="fade-down" class="grid md:grid-cols-3 gap-6">
+                <div class="glass-card rounded-lg p-6 text-center">
+                    <div class="text-4xl mb-3">
+                        <i class="fas fa-clock text-neon-green"></i>
+                    </div>
+                    <h4 class="font-bold mb-2">Автономність</h4>
+                    <p class="text-gray-400 text-sm">Працює навіть коли ПК вимкнений</p>
+                </div>
+                <div class="glass-card rounded-lg p-6 text-center">
+                    <div class="text-4xl mb-3">
+                        <i class="fas fa-power-off text-orange-500"></i>
+                    </div>
+                    <h4 class="font-bold mb-2">Hard Reset</h4>
+                    <p class="text-gray-400 text-sm">Фізичне перезавантаження, не програмне</p>
+                </div>
+                <div class="glass-card rounded-lg p-6 text-center">
+                    <div class="text-4xl mb-3">
+                        <i class="fas fa-bolt text-yellow-500"></i>
+                    </div>
+                    <h4 class="font-bold mb-2">Енергомоніторинг</h4>
+                    <p class="text-gray-400 text-sm">Контроль споживання Ват</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Telegram Integration -->
+    <section class="py-20 px-6 bg-gradient-to-b from-dark-card to-transparent">
+        <div class="container mx-auto max-w-7xl">
+            <div data-aos="fade-down" class="text-center mb-16">
+                <h2 class="font-display text-5xl font-bold mb-4 text-cyan-500">
+                    <i class="fab fa-telegram mr-3"></i> Telegram Інтеграція
+                </h2>
+                <div class="w-24 h-1 bg-cyan-500 mx-auto mb-4"></div>
+                <p class="text-gray-400 text-lg">Підсистема віддаленого моніторингу та керування через месенджер</p>
+                <p class="text-gray-500 font-mono text-sm mt-2">Мобільність без створення окремого додатку</p>
+            </div>
+            
+            <!-- Main Features Grid -->
+            <div class="grid md:grid-cols-3 gap-6 mb-12">
+                <!-- Automatic Alerts -->
+                <div data-aos="fade-down" data-aos-delay="100" class="glass-card rounded-lg p-6">
+                    <div class="text-center mb-4">
+                        <div class="inline-block p-4 bg-red-500 bg-opacity-20 rounded-full">
+                            <i class="fas fa-bell text-4xl text-red-500"></i>
+                        </div>
+                    </div>
+                    <h4 class="font-bold text-xl mb-3 text-center">Автоматичні Сповіщення</h4>
+                    <div class="bg-black bg-opacity-50 rounded p-4 font-mono text-xs space-y-2">
+                        <p class="text-red-400">🚨 ALERT: Network Down!</p>
+                        <p class="text-gray-400">━━━━━━━━━━━━━━━━━</p>
+                        <p class="text-gray-400">Gateway: <span class="text-red-400">Unreachable</span></p>
+                        <p class="text-gray-400">ISP: <span class="text-red-400">Timeout</span></p>
+                        <p class="text-gray-400">Duration: <span class="text-yellow-400">00:05:32</span></p>
+                        <p class="text-gray-400 mt-2">━━━━━━━━━━━━━━━━━</p>
+                        <p class="text-neon-green">✅ Auto-reboot initiated...</p>
+                    </div>
+                    <p class="text-gray-500 text-xs mt-3 italic">Ти на кухні, комп у кімнаті — бот тебе попередить</p>
+                </div>
+                
+                <!-- Screenshot Command -->
+                <div data-aos="fade-down" data-aos-delay="200" class="glass-card rounded-lg p-6">
+                    <div class="text-center mb-4">
+                        <div class="inline-block p-4 bg-purple-500 bg-opacity-20 rounded-full">
+                            <i class="fas fa-camera text-4xl text-purple-500"></i>
+                        </div>
+                    </div>
+                    <h4 class="font-bold text-xl mb-3 text-center">Remote Screenshot</h4>
+                    <div class="bg-black bg-opacity-50 rounded p-4 font-mono text-xs space-y-2">
+                        <p class="text-cyan-400">You: <span class="text-white">/screen</span></p>
+                        <p class="text-gray-400 mt-2">Bot: 📸 Capturing desktop...</p>
+                        <p class="text-gray-400">Bot: [Processing...]</p>
+                        <p class="text-neon-green mt-2">Bot: ✅ [Screenshot.png]</p>
+                        <div class="mt-3 p-2 bg-purple-900 bg-opacity-30 rounded">
+                            <p class="text-purple-300 text-xs">🖼️ [Image Preview]</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-500 text-xs mt-3 italic">Кілер-фіча! Перевір що відбувається на ПК</p>
+                </div>
+                
+                <!-- Reboot Command -->
+                <div data-aos="fade-down" data-aos-delay="300" class="glass-card rounded-lg p-6">
+                    <div class="text-center mb-4">
+                        <div class="inline-block p-4 bg-orange-500 bg-opacity-20 rounded-full">
+                            <i class="fas fa-power-off text-4xl text-orange-500"></i>
+                        </div>
+                    </div>
+                    <h4 class="font-bold text-xl mb-3 text-center">Remote Reboot</h4>
+                    <div class="bg-black bg-opacity-50 rounded p-4 font-mono text-xs space-y-2">
+                        <p class="text-cyan-400">You: <span class="text-white">/reboot</span></p>
+                        <p class="text-yellow-400 mt-2">Bot: ⚠️ Confirm router reboot?</p>
+                        <p class="text-yellow-400">Bot: [Yes] [No]</p>
+                        <p class="text-cyan-400 mt-2">You: <span class="text-white">Yes</span></p>
+                        <p class="text-neon-green mt-1">Bot: ✅ Rebooting router...</p>
+                        <p class="text-gray-400 text-xs mt-2">⏳ Please wait ~60 seconds</p>
+                    </div>
+                    <p class="text-gray-500 text-xs mt-3 italic">Фізичне перезавантаження через Tapo</p>
+                </div>
+            </div>
+            
+            <!-- Additional Commands -->
+            <div data-aos="fade-down" class="glass-card rounded-xl p-8 mb-8">
+                <h3 class="font-display text-2xl font-bold mb-6 text-center text-cyan-500">Доступні Команди</h3>
+                <div class="grid md:grid-cols-2 gap-4 font-mono text-sm">
+                    <div class="bg-black bg-opacity-50 rounded-lg p-4 flex items-center gap-3">
+                        <code class="text-yellow-400">/status</code>
+                        <span class="text-gray-400">→</span>
+                        <span class="text-gray-300">Поточний стан мережі (ping, speed, uptime)</span>
+                    </div>
+                    <div class="bg-black bg-opacity-50 rounded-lg p-4 flex items-center gap-3">
+                        <code class="text-yellow-400">/reboot</code>
+                        <span class="text-gray-400">→</span>
+                        <span class="text-gray-300">Фізичний перезапуск роутера</span>
+                    </div>
+                    <div class="bg-black bg-opacity-50 rounded-lg p-4 flex items-center gap-3">
+                        <code class="text-yellow-400">/screen</code>
+                        <span class="text-gray-400">→</span>
+                        <span class="text-gray-300">Скріншот робочого столу</span>
+                    </div>
+                    <div class="bg-black bg-opacity-50 rounded-lg p-4 flex items-center gap-3">
+                        <code class="text-yellow-400">/flushdns</code>
+                        <span class="text-gray-400">→</span>
+                        <span class="text-gray-300">Очистити DNS кеш</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Features -->
+            <div data-aos="fade-down" class="glass-card rounded-xl p-8 border-2 border-red-500">
+                <div class="flex items-start gap-6">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 rounded-full bg-red-500 bg-opacity-20 flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-3xl text-red-500"></i>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-display text-2xl font-bold mb-3 text-red-500">ID-Auth Захист</h3>
+                        <p class="text-gray-300 mb-4">Бот захищений від несанкціонованого доступу</p>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div class="bg-black bg-opacity-50 rounded p-4">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-user-check text-neon-green"></i>
+                                    <span class="font-semibold">ID Whitelist</span>
+                                </div>
+                                <p class="text-gray-400 text-xs">Бот відповідає тільки твоєму Telegram ID</p>
+                            </div>
+                            <div class="bg-black bg-opacity-50 rounded p-4">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-lock text-yellow-400"></i>
+                                    <span class="font-semibold">2FA Commands</span>
+                                </div>
+                                <p class="text-gray-400 text-xs">Критичні команди вимагають підтвердження</p>
+                            </div>
+                            <div class="bg-black bg-opacity-50 rounded p-4">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-history text-cyan-400"></i>
+                                    <span class="font-semibold">Audit Log</span>
+                                </div>
+                                <p class="text-gray-400 text-xs">Всі дії логуються з timestamp</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Project Advantages -->
+    <section class="py-20 px-6 relative">
+        <div class="container mx-auto max-w-7xl">
+            <div data-aos="fade-down" class="text-center mb-16">
+                <h2 class="font-display text-5xl font-bold mb-4 text-neon-green">Інноваційність Проекту</h2>
+                <div class="w-24 h-1 bg-neon-green mx-auto mb-4"></div>
+                <p class="text-gray-400 text-lg">Що робить NetGuardian унікальним?</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Left Column -->
+                <div class="space-y-6">
+                    <div data-aos="fade-right" class="glass-card rounded-lg p-6 border-l-4 border-neon-green">
+                        <div class="flex items-start gap-4">
+                            <div class="text-3xl text-neon-green">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-2">Багаторівнева Діагностика</h4>
+                                <p class="text-gray-400 text-sm">На відміну від звичайних програм що кажуть "немає інтернету", NetGuardian точно визначає винуватця: роутер, провайдер чи сервер</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div data-aos="fade-right" data-aos-delay="100" class="glass-card rounded-lg p-6 border-l-4 border-purple-500">
+                        <div class="flex items-start gap-4">
+                            <div class="text-3xl text-purple-500">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-2">AI-Інтерпретація</h4>
+                                <p class="text-gray-400 text-sm">Локальна нейромережа перекладає технічні помилки на зрозумілу людську мову без потреби у знаннях IT</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div data-aos="fade-right" data-aos-delay="200" class="glass-card rounded-lg p-6 border-l-4 border-orange-500">
+                        <div class="flex items-start gap-4">
+                            <div class="text-3xl text-orange-500">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-2">IoT Інтеграція</h4>
+                                <p class="text-gray-400 text-sm">Фізичний watchdog на базі Raspberry Pi — рішення промислового рівня для домашнього використання</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div class="space-y-6">
+                    <div data-aos="fade-left" class="glass-card rounded-lg p-6 border-l-4 border-cyan-500">
+                        <div class="flex items-start gap-4">
+                            <div class="text-3xl text-cyan-500">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-2">Мобільне Керування</h4>
+                                <p class="text-gray-400 text-sm">Telegram інтеграція замість створення окремого додатку — економія часу та простота у використанні</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div data-aos="fade-left" data-aos-delay="100" class="glass-card rounded-lg p-6 border-l-4 border-yellow-500">
+                        <div class="flex items-start gap-4">
+                            <div class="text-3xl text-yellow-500">
+                                <i class="fas fa-magic"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-2">Повна Автоматизація</h4>
+                                <p class="text-gray-400 text-sm">Від діагностики до виправлення — система працює без втручання користувача, економлячи час та нерви</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div data-aos="fade-left" data-aos-delay="200" class="glass-card rounded-lg p-6 border-l-4 border-red-500">
+                        <div class="flex items-start gap-4">
+                            <div class="text-3xl text-red-500">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-2">Безпека та Аудит</h4>
+                                <p class="text-gray-400 text-sm">Сканування локальної мережі, виявлення вразливостей роутера, захист у публічних Wi-Fi</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics -->
+            <div data-aos="fade-down" data-aos-delay="300" class="glass-card rounded-xl p-10 mt-12 text-center">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div>
+                        <div class="text-4xl font-bold text-neon-green mb-2">8</div>
+                        <p class="text-gray-400 text-sm">Програмних функцій</p>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold text-orange-500 mb-2">3</div>
+                        <p class="text-gray-400 text-sm">Апаратні компоненти</p>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold text-cyan-500 mb-2">4</div>
+                        <p class="text-gray-400 text-sm">Telegram команд</p>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold text-purple-500 mb-2">24/7</div>
+                        <p class="text-gray-400 text-sm">Безперервний моніторинг</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Installation Guide -->
+    <section class="py-20 px-6 bg-gradient-to-b from-dark-card to-transparent relative">
+        <div class="container mx-auto max-w-6xl">
+            <div data-aos="fade-down" class="text-center mb-16">
+                <h2 class="font-display text-5xl font-bold mb-4 text-cyan-500">Як Підключити?</h2>
+                <div class="w-24 h-1 bg-cyan-500 mx-auto mb-4"></div>
+                <p class="text-gray-400 text-lg">Три простих кроки до захищеної мережі</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
+                <!-- Step 1 -->
+                <div data-aos="fade-down" data-aos-delay="100" class="flex-1 max-w-xs">
+                    <div class="glass-card rounded-xl p-8 text-center relative">
+                        <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-full bg-neon-green flex items-center justify-center font-bold text-dark-bg text-xl">
+                            1
+                        </div>
+                        <div class="mt-4 mb-6">
+                            <div class="inline-block p-6 bg-neon-green bg-opacity-10 rounded-full">
+                                <i class="fas fa-download text-5xl text-neon-green"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3">Завантаж Agent</h3>
+                        <p class="text-gray-400 text-sm mb-4">Встанови Desktop Agent на свій ПК (Windows/Linux)</p>
+                        <div class="bg-black bg-opacity-50 rounded p-3 font-mono text-xs text-neon-green">
+                            netguardian-setup.exe
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Arrow -->
+                <div data-aos="fade-right" data-aos-delay="200" class="hidden md:block text-cyan-500 text-4xl">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                
+                <!-- Step 2 -->
+                <div data-aos="fade-down" data-aos-delay="300" class="flex-1 max-w-xs">
+                    <div class="glass-card rounded-xl p-8 text-center relative">
+                        <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center font-bold text-dark-bg text-xl">
+                            2
+                        </div>
+                        <div class="mt-4 mb-6">
+                            <div class="inline-block p-6 bg-orange-500 bg-opacity-10 rounded-full">
+                                <i class="fas fa-ethernet text-5xl text-orange-500"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3">Підключи Зонд</h3>
+                        <p class="text-gray-400 text-sm mb-4">Raspberry Pi Zero 2 W до роутера через адаптер SUNROZ та розетку Tapo P110</p>
+                        <div class="bg-black bg-opacity-50 rounded p-3 font-mono text-xs text-orange-400">
+                            USB → RJ45 → Router
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Arrow -->
+                <div data-aos="fade-right" data-aos-delay="400" class="hidden md:block text-cyan-500 text-4xl">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                
+                <!-- Step 3 -->
+                <div data-aos="fade-down" data-aos-delay="500" class="flex-1 max-w-xs">
+                    <div class="glass-card rounded-xl p-8 text-center relative">
+                        <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center font-bold text-dark-bg text-xl">
+                            3
+                        </div>
+                        <div class="mt-4 mb-6">
+                            <div class="inline-block p-6 bg-cyan-500 bg-opacity-10 rounded-full">
+                                <i class="fab fa-telegram text-5xl text-cyan-500"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3">Скануй QR-код</h3>
+                        <p class="text-gray-400 text-sm mb-4">Підключися до Telegram бота</p>
+                        <div class="bg-black bg-opacity-50 rounded p-4 inline-block neon-border">
+                            <img 
+                                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/NetGuardian_Bot&color=00ff41&bgcolor=0a0a0a" 
+                                alt="QR Code" 
+                                class="w-32 h-32 mx-auto"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Info -->
+            <div data-aos="fade-down" data-aos-delay="600" class="mt-12 text-center">
+                <p class="text-gray-500 font-mono text-sm">
+                    <i class="fas fa-info-circle text-cyan-500 mr-2"></i>
+                    Повна інструкція включена в інсталятор
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Tech Stack -->
+    <section class="py-20 px-6 bg-gradient-to-b from-transparent to-dark-card">
+        <div class="container mx-auto max-w-7xl">
+            <div data-aos="fade-down" class="text-center mb-16">
+                <h2 class="font-display text-5xl font-bold mb-4">Технічний Стек</h2>
+                <div class="w-24 h-1 bg-neon-green mx-auto mb-4"></div>
+                <p class="text-gray-400 text-lg">Сучасні технології для надійного рішення</p>
+            </div>
+            
+            <!-- Main Technologies -->
+            <div data-aos="fade-down" class="glass-card rounded-2xl p-10 mb-10">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-8 text-center mb-8">
+                    <div class="tech-icon group">
+                        <i class="fab fa-python text-6xl text-blue-400 mb-3"></i>
+                        <p class="font-mono text-sm font-bold">Python 3.10</p>
+                        <p class="text-xs text-gray-500 mt-1">Основна мова</p>
+                    </div>
+                    <div class="tech-icon group">
+                        <i class="fas fa-window-maximize text-6xl text-purple-400 mb-3"></i>
+                        <p class="font-mono text-sm font-bold">CustomTkinter</p>
+                        <p class="text-xs text-gray-500 mt-1">Desktop UI</p>
+                    </div>
+                    <div class="tech-icon group">
+                        <i class="fas fa-flask text-6xl text-green-400 mb-3"></i>
+                        <p class="font-mono text-sm font-bold">Flask API</p>
+                        <p class="text-xs text-gray-500 mt-1">Зонд сервер</p>
+                    </div>
+                    <div class="tech-icon group">
+                        <i class="fab fa-telegram text-6xl text-cyan-400 mb-3"></i>
+                        <p class="font-mono text-sm font-bold">Aiogram</p>
+                        <p class="text-xs text-gray-500 mt-1">Telegram Bot</p>
+                    </div>
+                    <div class="tech-icon group">
+                        <i class="fab fa-linux text-6xl text-yellow-400 mb-3"></i>
+                        <p class="font-mono text-sm font-bold">Raspberry Pi OS</p>
+                        <p class="text-xs text-gray-500 mt-1">Pi Operating System</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Stack Breakdown -->
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Desktop Application -->
+                <div data-aos="fade-down" data-aos-delay="100" class="glass-card rounded-lg p-6">
+                    <h3 class="font-display text-xl font-bold mb-4 text-neon-green flex items-center gap-2">
+                        <i class="fas fa-desktop"></i>
+                        Desktop Agent
+                    </h3>
+                    <div class="space-y-2 text-sm font-mono">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Core:</span>
+                            <span class="text-white">Python 3.10+</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">GUI:</span>
+                            <span class="text-white">CustomTkinter</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Network:</span>
+                            <span class="text-white">scapy, psutil</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">AI/LLM:</span>
+                            <span class="text-white">OpenAI API</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">DB:</span>
+                            <span class="text-white">SQLite</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Automation:</span>
+                            <span class="text-white">subprocess</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hardware Probe -->
+                <div data-aos="fade-down" data-aos-delay="200" class="glass-card rounded-lg p-6">
+                    <h3 class="font-display text-xl font-bold mb-4 text-orange-500 flex items-center gap-2">
+                        <i class="fas fa-microchip"></i>
+                        Hardware Probe
+                    </h3>
+                    <div class="space-y-2 text-sm font-mono">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Hardware:</span>
+                            <span class="text-white">Raspberry Pi Zero 2 W</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">OS:</span>
+                            <span class="text-white">Raspberry Pi OS Lite</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Server:</span>
+                            <span class="text-white">Flask REST API</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">IoT Control:</span>
+                            <span class="text-white">TP-Link Tapo Local</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Adapter:</span>
+                            <span class="text-white">SUNROZ USB-RJ45</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Logging:</span>
+                            <span class="text-white">Python logging</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Telegram Bot -->
+                <div data-aos="fade-down" data-aos-delay="300" class="glass-card rounded-lg p-6">
+                    <h3 class="font-display text-xl font-bold mb-4 text-cyan-500 flex items-center gap-2">
+                        <i class="fab fa-telegram"></i>
+                        Telegram Bot
+                    </h3>
+                    <div class="space-y-2 text-sm font-mono">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Framework:</span>
+                            <span class="text-white">Aiogram 3.x</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">API:</span>
+                            <span class="text-white">Telegram Bot API</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Screenshot:</span>
+                            <span class="text-white">Pillow, mss</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Security:</span>
+                            <span class="text-white">ID Whitelist</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Async:</span>
+                            <span class="text-white">asyncio</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Hosting:</span>
+                            <span class="text-white">Long Polling</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Architecture Diagram -->
+            <div data-aos="fade-down" class="glass-card rounded-xl p-8 mt-10">
+                <h3 class="font-display text-2xl font-bold mb-6 text-center">Архітектура Взаємодії</h3>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-6 font-mono text-sm">
+                    <div class="text-center">
+                        <div class="w-24 h-24 rounded-lg bg-neon-green bg-opacity-20 border-2 border-neon-green flex items-center justify-center mb-2">
+                            <i class="fas fa-desktop text-3xl text-neon-green"></i>
+                        </div>
+                        <p class="font-bold">Desktop Agent</p>
+                        <p class="text-xs text-gray-400">Windows/Linux</p>
+                    </div>
+                    
+                    <div class="text-neon-green text-2xl">
+                        <i class="fas fa-arrows-alt-h"></i>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-24 h-24 rounded-lg bg-orange-500 bg-opacity-20 border-2 border-orange-500 flex items-center justify-center mb-2">
+                            <i class="fas fa-microchip text-3xl text-orange-500"></i>
+                        </div>
+                        <p class="font-bold">Raspberry Pi</p>
+                        <p class="text-xs text-gray-400">24/7 Watchdog</p>
+                    </div>
+                    
+                    <div class="text-orange-500 text-2xl">
+                        <i class="fas fa-arrows-alt-h"></i>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-24 h-24 rounded-lg bg-red-500 bg-opacity-20 border-2 border-red-500 flex items-center justify-center mb-2">
+                            <i class="fas fa-plug text-3xl text-red-500"></i>
+                        </div>
+                        <p class="font-bold">Tapo P110</p>
+                        <p class="text-xs text-gray-400">Smart Socket</p>
+                    </div>
+                    
+                    <div class="text-red-500 text-2xl">
+                        <i class="fas fa-long-arrow-alt-right"></i>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-24 h-24 rounded-lg bg-blue-500 bg-opacity-20 border-2 border-blue-500 flex items-center justify-center mb-2">
+                            <i class="fas fa-router text-3xl text-blue-500"></i>
+                        </div>
+                        <p class="font-bold">Router</p>
+                        <p class="text-xs text-gray-400">Physical Reboot</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 text-center">
+                    <div class="inline-flex items-center gap-3 bg-cyan-500 bg-opacity-10 border border-cyan-500 rounded-lg px-6 py-3">
+                        <i class="fab fa-telegram text-2xl text-cyan-500"></i>
+                        <div class="text-left">
+                            <p class="font-bold text-cyan-500">Telegram Bot</p>
+                            <p class="text-xs text-gray-400">Remote Control Layer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Download Hub -->
+    <section class="py-20 px-6 relative">
+        <div class="container mx-auto max-w-6xl">
+            <div data-aos="fade-down" class="text-center mb-16">
+                <h2 class="font-display text-5xl font-bold mb-4 neon-text">Download Center</h2>
+                <div class="w-24 h-1 bg-neon-green mx-auto mb-4"></div>
+                <p class="text-gray-400 text-lg">Завантажте NetGuardian та почніть захищати свою мережу</p>
+            </div>
+            
+            <div data-aos="fade-down" class="glass-card rounded-2xl p-10 neon-border">
+                <div class="grid md:grid-cols-2 gap-12">
+                    <!-- Left: Download Info -->
+                    <div>
+                        <div class="mb-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="px-4 py-2 bg-neon-green bg-opacity-20 border border-neon-green rounded-lg">
+                                    <span class="font-mono text-neon-green font-bold">Beta v1.0.4</span>
+                                </div>
+                                <div class="px-4 py-2 bg-cyan-500 bg-opacity-20 border border-cyan-500 rounded-lg">
+                                    <span class="font-mono text-cyan-500 text-sm">Stable Build</span>
+                                </div>
+                            </div>
+                            <h3 class="font-display text-3xl font-bold mb-2">NetGuardian Desktop Agent</h3>
+                            <p class="text-gray-400 text-sm">Остання стабільна версія з підтримкою IoT</p>
+                        </div>
+                        
+                        <!-- System Requirements -->
+                        <div class="bg-black bg-opacity-50 rounded-lg p-6 mb-6">
+                            <h4 class="font-bold text-lg mb-4 text-neon-green flex items-center gap-2">
+                                <i class="fas fa-laptop"></i>
+                                Системні Вимоги
+                            </h4>
+                            <div class="space-y-2 text-sm font-mono">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">OS:</span>
+                                    <span class="text-white">Windows 10/11, Linux</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">Python:</span>
+                                    <span class="text-white">3.10 або новіша</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">RAM:</span>
+                                    <span class="text-white">Мін. 2 GB</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">Disk:</span>
+                                    <span class="text-white">150 MB вільного місця</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">Network:</span>
+                                    <span class="text-white">Ethernet/Wi-Fi</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- File Hash -->
+                        <div class="bg-black bg-opacity-50 rounded-lg p-4 mb-6">
+                            <p class="text-xs text-gray-500 mb-1">SHA-256 Checksum:</p>
+                            <code class="text-xs text-cyan-400 break-all font-mono">
+                                a3f5c8b2e9d1f7a4c6b8e2d5f9a1c3e7b4d6f8a2c5e7b9d1f3a5c7e9b2d4f6a8
+                            </code>
+                        </div>
+                        
+                        <!-- Download Button -->
+                        <button 
+                            id="downloadBtn"
+                            class="w-full cyber-btn text-lg py-4 relative overflow-hidden group"
+                        >
+                            <span class="relative z-10 flex items-center justify-center gap-3">
+                                <i class="fas fa-download"></i>
+                                Завантажити NetGuardian
+                                <span class="text-sm">(24.5 MB)</span>
+                            </span>
+                            <div class="absolute inset-0 bg-neon-green opacity-0 group-hover:opacity-20 transition-opacity pulse-animation"></div>
+                        </button>
+                        
+                        <p class="text-center text-xs text-gray-500 mt-3 font-mono">
+                            <i class="fas fa-shield-alt text-neon-green mr-1"></i>
+                            Безпечне завантаження | Без реклами
+                        </p>
+                    </div>
+                    
+                    <!-- Right: Changelog -->
+                    <div>
+                        <div class="bg-black bg-opacity-70 rounded-lg p-6 h-full border border-neon-green border-opacity-30">
+                            <div class="flex items-center gap-2 mb-4 pb-3 border-b border-neon-green border-opacity-30">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                <span class="ml-2 text-gray-400 font-mono text-sm">changelog.txt</span>
+                            </div>
+                            
+                            <div class="space-y-4 font-mono text-sm max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+                                <!-- Version 1.0.4 -->
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="text-neon-green font-bold">v1.0.4</span>
+                                        <span class="text-gray-500 text-xs">2026-01-28</span>
+                                    </div>
+                                    <ul class="space-y-1 text-xs text-gray-300">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-400">+</span>
+                                            <span>Added Raspberry Pi Zero 2 W support</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-400">+</span>
+                                            <span>TP-Link Tapo P110 integration (Local API)</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-400">+</span>
+                                            <span>Energy monitoring via Tapo P110</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-cyan-400">*</span>
+                                            <span>Improved AI log interpretation accuracy</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-red-400">-</span>
+                                            <span>Fixed DNS leak on VPN switch</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="border-t border-gray-700 my-3"></div>
+                                
+                                <!-- Version 1.0.3 -->
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="text-yellow-400 font-bold">v1.0.3</span>
+                                        <span class="text-gray-500 text-xs">2026-01-15</span>
+                                    </div>
+                                    <ul class="space-y-1 text-xs text-gray-300">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-400">+</span>
+                                            <span>Telegram bot remote screenshot</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-cyan-400">*</span>
+                                            <span>Enhanced game mode optimizer</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-red-400">-</span>
+                                            <span>Fixed ping calculation overflow</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="border-t border-gray-700 my-3"></div>
+                                
+                                <!-- Version 1.0.2 -->
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="text-yellow-400 font-bold">v1.0.2</span>
+                                        <span class="text-gray-500 text-xs">2025-12-20</span>
+                                    </div>
+                                    <ul class="space-y-1 text-xs text-gray-300">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-400">+</span>
+                                            <span>LAN Security Audit module</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-400">+</span>
+                                            <span>Link Speed Monitor</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-cyan-400">*</span>
+                                            <span>UI improvements and dark theme polish</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="border-t border-gray-700 my-3"></div>
+                                
+                                <!-- Version 1.0.1 -->
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="text-gray-400 font-bold">v1.0.1</span>
+                                        <span class="text-gray-500 text-xs">2025-12-01</span>
+                                    </div>
+                                    <ul class="space-y-1 text-xs text-gray-300">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-400">+</span>
+                                            <span>Initial public beta release</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-400">+</span>
+                                            <span>Core diagnostics engine</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-400">+</span>
+                                            <span>LLM log humanizer integration</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-3 border-t border-gray-700">
+                                <p class="text-xs text-gray-500 font-mono">
+                                    <span class="text-green-400">+</span> Added
+                                    <span class="text-cyan-400 ml-3">*</span> Changed
+                                    <span class="text-red-400 ml-3">-</span> Fixed
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Download Modal -->
+    <div id="downloadModal" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-card rounded-2xl p-10 max-w-md w-full mx-4 border-2 border-neon-green transform scale-95 transition-transform duration-300" id="modalContent">
+            <div class="text-center mb-6">
+                <div class="inline-block p-4 bg-neon-green bg-opacity-20 rounded-full mb-4">
+                    <i class="fas fa-download text-5xl text-neon-green"></i>
+                </div>
+                <h3 class="font-display text-2xl font-bold mb-2">Завантаження</h3>
+                <p class="text-gray-400 text-sm" id="downloadStatus">Підключення до сервера...</p>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="mb-6">
+                <div class="bg-gray-800 rounded-full h-4 overflow-hidden relative">
+                    <div id="progressBar" class="h-full bg-gradient-to-r from-neon-green to-cyan-500 transition-all duration-300 relative" style="width: 0%;">
+                        <div class="absolute inset-0 bg-white opacity-30 animate-pulse"></div>
+                    </div>
+                </div>
+                <div class="flex justify-between mt-2 font-mono text-sm">
+                    <span class="text-gray-400">Прогрес:</span>
+                    <span class="text-neon-green font-bold" id="progressPercent">0%</span>
+                </div>
+            </div>
+            
+            <!-- Status Messages -->
+            <div class="bg-black bg-opacity-50 rounded-lg p-4 font-mono text-xs space-y-1 max-h-32 overflow-y-auto" id="statusLog">
+                <p class="text-gray-500">Initializing download...</p>
+            </div>
+            
+            <!-- Close Button (hidden initially) -->
+            <button id="closeModal" class="w-full cyber-btn mt-6 opacity-0 pointer-events-none transition-opacity duration-300">
+                <i class="fas fa-check-circle mr-2"></i> Готово
+            </button>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="py-16 px-6 border-t border-dark-border bg-dark-card">
+        <div class="container mx-auto max-w-6xl">
+            <div class="grid md:grid-cols-3 gap-12 mb-8">
+                <!-- Left: Project Info -->
+                <div>
+                    <h3 class="font-display text-3xl font-bold mb-4 neon-text">NetGuardian</h3>
+                    <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                        Інтелектуальний програмно-апаратний комплекс для діагностики та відновлення мереж
+                    </p>
+                    <div class="flex gap-3">
+                        <span class="px-3 py-1 bg-neon-green bg-opacity-10 border border-neon-green rounded text-neon-green text-xs">
+                            IoT
+                        </span>
+                        <span class="px-3 py-1 bg-purple-500 bg-opacity-10 border border-purple-500 rounded text-purple-500 text-xs">
+                            AI
+                        </span>
+                        <span class="px-3 py-1 bg-cyan-500 bg-opacity-10 border border-cyan-500 rounded text-cyan-500 text-xs">
+                            Python
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Center: Quick Links -->
+                <div>
+                    <h4 class="font-bold text-lg mb-4 text-neon-green">Компоненти</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><i class="fas fa-chevron-right text-neon-green mr-2 text-xs"></i> Desktop Agent</li>
+                        <li><i class="fas fa-chevron-right text-neon-green mr-2 text-xs"></i> Hardware Probe (Raspberry Pi)</li>
+                        <li><i class="fas fa-chevron-right text-neon-green mr-2 text-xs"></i> Telegram Bot</li>
+                        <li><i class="fas fa-chevron-right text-neon-green mr-2 text-xs"></i> Smart Socket (Tapo P110)</li>
+                    </ul>
+                </div>
+                
+                <!-- Right: Tech Info -->
+                <div>
+                    <h4 class="font-bold text-lg mb-4 text-neon-green">Технології</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><i class="fab fa-python text-blue-400 mr-2"></i> Python 3.10+</li>
+                        <li><i class="fas fa-microchip text-orange-400 mr-2"></i> Raspberry Pi Zero 2 W</li>
+                        <li><i class="fab fa-telegram text-cyan-400 mr-2"></i> Telegram API</li>
+                        <li><i class="fas fa-brain text-purple-400 mr-2"></i> AI/LLM Integration</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Bottom: Copyright and Social -->
+            <div class="pt-8 border-t border-dark-border">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-gray-500 text-sm font-mono">
+                        © 2026 NetGuardian Project | Дипломна робота
+                    </p>
+                    <div class="flex gap-6">
+                        <a href="#" class="text-gray-400 hover:text-neon-green transition-colors">
+                            <i class="fab fa-github text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-cyan-500 transition-colors">
+                            <i class="fab fa-telegram text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">
+                            <i class="fas fa-envelope text-2xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Made with love -->
+            <div class="text-center mt-6">
+                <p class="text-gray-600 text-xs font-mono">
+                    Designed & Developed with <span class="text-red-500 animate-pulse">♥</span> for Network Engineers
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scroll to Top Button -->
+    <button id="scrollTopBtn" class="fixed bottom-8 right-8 w-12 h-12 bg-neon-green text-dark-bg rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-300 hover:scale-110 z-50">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
+    <!-- Initialize AOS -->
+    <script>
+        AOS.init({
+            duration: 800,
+            once: false,
+            mirror: true,
+            offset: 100,
+            easing: 'ease-in-out-cubic',
+            anchorPlacement: 'top-center',
+        });
+        
+        // Custom bidirectional fade effect
+        let lastScrollTop = 0;
+        
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollDirection = scrollTop > lastScrollTop ? 'down' : 'up';
+            
+            document.querySelectorAll('[data-aos]').forEach(function(element) {
+                const rect = element.getBoundingClientRect();
+                const elementTop = rect.top;
+                const elementBottom = rect.bottom;
+                const windowHeight = window.innerHeight;
+                
+                // Fade out when scrolling DOWN (element goes UP out of viewport)
+                if (scrollDirection === 'down' && elementBottom < 0) {
+                    element.style.opacity = '0';
+                    element.style.transform = 'translateY(-50px)';
+                    element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                }
+                // Fade out when scrolling UP (element goes DOWN out of viewport)
+                else if (scrollDirection === 'up' && elementTop > windowHeight) {
+                    element.style.opacity = '0';
+                    element.style.transform = 'translateY(50px)';
+                    element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                }
+                // Fade in when element enters viewport
+                else if (elementTop < windowHeight && elementBottom > 0) {
+                    element.style.opacity = '';
+                    element.style.transform = '';
+                }
+            });
+            
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }, false);
+        
+        // Scroll to Top Button
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.style.opacity = '1';
+                scrollTopBtn.style.pointerEvents = 'auto';
+            } else {
+                scrollTopBtn.style.opacity = '0';
+                scrollTopBtn.style.pointerEvents = 'none';
+            }
+        });
+        
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Add smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Download Modal Logic
+        const downloadBtn = document.getElementById('downloadBtn');
+        const downloadModal = document.getElementById('downloadModal');
+        const modalContent = document.getElementById('modalContent');
+        const closeModalBtn = document.getElementById('closeModal');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const downloadStatus = document.getElementById('downloadStatus');
+        const statusLog = document.getElementById('statusLog');
+        
+        const statuses = [
+            { percent: 0, text: 'Підключення до сервера...', log: '> Connecting to cdn.netguardian.io...' },
+            { percent: 15, text: 'Встановлення захищеного з\'єднання...', log: '> SSL handshake... OK' },
+            { percent: 30, text: 'Завантаження основного модуля...', log: '> Downloading netguardian-core.exe...' },
+            { percent: 50, text: 'Завантаження AI компонентів...', log: '> Downloading ai-modules.dll...' },
+            { percent: 65, text: 'Завантаження IoT драйверів...', log: '> Downloading iot-drivers.pak...' },
+            { percent: 80, text: 'Перевірка цілісності файлів...', log: '> Verifying SHA-256 checksums...' },
+            { percent: 90, text: 'Розпаковування архіву...', log: '> Extracting files... 24.5 MB' },
+            { percent: 100, text: 'Завершено!', log: '> Download complete! ✓' }
+        ];
+        
+        function updateProgress(index) {
+            if (index >= statuses.length) {
+                // Download complete
+                setTimeout(() => {
+                    closeModalBtn.style.opacity = '1';
+                    closeModalBtn.style.pointerEvents = 'auto';
+                }, 500);
+                return;
+            }
+            
+            const status = statuses[index];
+            progressBar.style.width = status.percent + '%';
+            progressPercent.textContent = status.percent + '%';
+            downloadStatus.textContent = status.text;
+            
+            // Add log entry
+            const logEntry = document.createElement('p');
+            logEntry.className = status.percent === 100 ? 'text-neon-green' : 'text-cyan-400';
+            logEntry.textContent = status.log;
+            statusLog.appendChild(logEntry);
+            statusLog.scrollTop = statusLog.scrollHeight;
+            
+            // Calculate dynamic delay (faster at start, slower at end)
+            const delay = index < 3 ? 400 : (index < 6 ? 500 : 600);
+            
+            setTimeout(() => updateProgress(index + 1), delay);
+        }
+        
+        downloadBtn.addEventListener('click', () => {
+            // Show modal
+            downloadModal.style.opacity = '1';
+            downloadModal.style.pointerEvents = 'auto';
+            modalContent.style.transform = 'scale(1)';
+            
+            // Reset state
+            progressBar.style.width = '0%';
+            progressPercent.textContent = '0%';
+            statusLog.innerHTML = '<p class="text-gray-500">Initializing download...</p>';
+            closeModalBtn.style.opacity = '0';
+            closeModalBtn.style.pointerEvents = 'none';
+            
+            // Start progress animation
+            setTimeout(() => updateProgress(0), 500);
+        });
+        
+        closeModalBtn.addEventListener('click', () => {
+            downloadModal.style.opacity = '0';
+            downloadModal.style.pointerEvents = 'none';
+            modalContent.style.transform = 'scale(0.95)';
+        });
+        
+        // Close modal on background click
+        downloadModal.addEventListener('click', (e) => {
+            if (e.target === downloadModal) {
+                if (closeModalBtn.style.opacity === '1') {
+                    downloadModal.style.opacity = '0';
+                    downloadModal.style.pointerEvents = 'none';
+                    modalContent.style.transform = 'scale(0.95)';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
